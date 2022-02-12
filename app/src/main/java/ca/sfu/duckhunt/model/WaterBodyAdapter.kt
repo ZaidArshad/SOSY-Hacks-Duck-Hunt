@@ -20,21 +20,24 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.graphics.Bitmap
 
 import android.graphics.drawable.BitmapDrawable
+import android.opengl.Visibility
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLngBounds
 
 
-
-
-class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<WaterBody>, map: GoogleMap):
+class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<WaterBody>, activity: MapsActivity, map: GoogleMap):
     ArrayAdapter<WaterBody>(context, resource, objects) {
     private val mContext = context
     private val mResource = resource
     private val quackSound : MediaPlayer = MediaPlayer.create(getContext(), R.raw.duck_sound)
+    private val mActivity = activity
     private val mMap = map
 
     @SuppressLint("ViewHolder", "SetTextI18n")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val name = getItem(position)?.getName()
         val distance = getItem(position)?.getDistance()
+        val pos = getItem(position)!!.getPosition()
 
         val inflater = LayoutInflater.from(mContext)
         val view = inflater.inflate(mResource, parent, false)
@@ -56,7 +59,36 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
             }
         }
 
+        view.setOnClickListener {
+            Animations.fadeOut(mActivity.listView, context)
+            mMap.clear()
+            val bound = getBounds(arrayOf(pos, mActivity.userPosition))
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bound, 100))
+            mActivity.generateRouteTo(mMap, pos)
+        }
+
         return view
+    }
+
+    fun getBounds(points: Array<LatLng>): LatLngBounds {
+
+        // Setting up variables
+        var north = points.first().latitude
+        var south = points.last().latitude
+        var west = points.first().longitude
+        var east = points.first().longitude
+
+        // Comparing with the extreme points
+        for (point in points) {
+            if (point.latitude > north) north = point.latitude
+            else if (point.latitude < south) south = point.latitude
+
+            if (point.longitude > east) east = point.longitude
+            else if (point.longitude < west) west = point.longitude
+        }
+
+        // Sets the bounds
+        return LatLngBounds(LatLng(south,west), LatLng(north, east))
     }
 
 }

@@ -23,6 +23,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.duckhunt.databinding.ActivityMapsBinding
+import ca.sfu.duckhunt.model.Animations
 import ca.sfu.duckhunt.model.NearbyBodyReceiver
 import ca.sfu.duckhunt.model.Route
 import ca.sfu.duckhunt.model.WaterBodyAdapter
@@ -39,7 +40,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var userPosition: LatLng
+    lateinit var userPosition: LatLng
+    lateinit var listView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,21 +90,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.interval = 30000
         locationRequest.fastestInterval = 10000
 
+        val button = findViewById<Button>(R.id.button)
+
+        button.setOnClickListener {
+            Animations.fadeIn(listView,this)
+        }
+
         var placedDucks = false
-        val listView = findViewById<ListView>(R.id.list)
+        listView = findViewById<ListView>(R.id.list)
         val waterBodies = NearbyBodyReceiver.getBodies(context)
-        val waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, mMap)
+        val waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, this, mMap)
         listView.adapter = waterBodyAdapter
+
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.requestLocationUpdates(
             locationRequest, object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
                     super.onLocationResult(locationResult)
                     userPosition = LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
 
                     if (!placedDucks) {
-                        generateRouteTo(mMap, userPosition, exampleDestination)
                         waterBodyAdapter.notifyDataSetChanged()
                         for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
                         if (waterBodies.size > 0) placedDucks = true
@@ -113,8 +121,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private fun generateRouteTo(map : GoogleMap, userPosition : LatLng, destination : LatLng) {
-        mMap.addMarker(MarkerOptions().position(userPosition).title("Origin"))
+    fun generateRouteTo(map : GoogleMap, destination : LatLng) {
         mMap.addMarker(MarkerOptions().position(destination).title("Destination"))
         val currentRoute = Route(userPosition, destination, map, this)
         currentRoute.generateRoute()
