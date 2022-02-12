@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
@@ -24,7 +25,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.duckhunt.databinding.ActivityMapsBinding
 import ca.sfu.duckhunt.model.NearbyBodyReceiver
 import ca.sfu.duckhunt.model.Route
-import ca.sfu.duckhunt.model.WaterBody
 import ca.sfu.duckhunt.model.WaterBodyAdapter
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -84,17 +84,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 30000
-        locationRequest.fastestInterval = 30000
+        locationRequest.fastestInterval = 10000
 
         val button = findViewById<Button>(R.id.button)
         val listView = findViewById<ListView>(R.id.list)
-        val list = NearbyBodyReceiver.getBodies(this)
-        val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, list, activity = MapsActivity())
+        val waterBodies = NearbyBodyReceiver.getBodies(this)
+        val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, waterBodies, mMap)
         listView.adapter = waterBodyAdapter
+
+
 
         button.setOnClickListener {
             waterBodyAdapter.notifyDataSetChanged()
         }
+
+        var placedDucks = false
 
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.requestLocationUpdates(
@@ -103,27 +107,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     super.onLocationResult(locationResult)
                     userPosition = LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
-                    generateRouteTo(mMap, userPosition, exampleDestination)
-                    waterBodyAdapter.notifyDataSetChanged()
+
+                    if (!placedDucks) {
+                        generateRouteTo(mMap, userPosition, exampleDestination)
+                        waterBodyAdapter.notifyDataSetChanged()
+                        for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
+                        if (waterBodies.size > 0) placedDucks = true
+                    }
                 }
             },
             Looper.getMainLooper()
         )
-    }
-
-    private fun drawMarker(waterBody: WaterBody) {
-        var img = 0
-        if (waterBody.hasDuck()) img = R.drawable.duck_pic
-        else img = R.drawable.duck_pic_black
-
-        val duckyIcon = AppCompatResources.getDrawable(
-            this, img)!!.toBitmap()
-        val duckyMarker = MarkerOptions()
-        duckyMarker.icon(BitmapDescriptorFactory.fromBitmap(duckyIcon))
-
-        // Puts the created marker on map
-        duckyMarker.position(waterBody.getPosition())
-        mMap.addMarker(duckyMarker)!!
     }
 
     private fun generateRouteTo(map : GoogleMap, userPosition : LatLng, destination : LatLng) {
@@ -152,5 +146,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             }
         }
+    }
+
+    private fun drawMarker(hasDuck: Boolean, position: LatLng) {
+        var img = 0
+        if (hasDuck) img = R.drawable.duck_pic
+        else img = R.drawable.duck_pic_black
+
+        val duckyImg = AppCompatResources.getDrawable(
+            this, img)!!.toBitmap()
+        val duckyIcon = Bitmap.createScaledBitmap(duckyImg, 100, 90, false)
+
+        val duckyMarker = MarkerOptions()
+        duckyMarker.icon(BitmapDescriptorFactory.fromBitmap(duckyIcon))
+
+        // Puts the created marker on map
+        duckyMarker.position(position)
+        mMap.addMarker(duckyMarker)!!
     }
 }
