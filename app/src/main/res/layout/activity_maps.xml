@@ -11,14 +11,15 @@
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="match_parent"
         android:scrollbars="vertical" />
 
     <ListView
         android:id="@+id/list"
+        android:background="@android:color/holo_blue_bright"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_gravity="bottom"
-        />
+        android:translationZ="1dp"
+        android:layout_height="232dp"
+        android:layout_gravity="bottom" />
 
 </FrameLayout>

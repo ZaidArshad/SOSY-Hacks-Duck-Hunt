@@ -8,8 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.ListView
 import androidx.core.app.ActivityCompat
 import ca.sfu.duckhunt.R
@@ -21,6 +19,14 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.duckhunt.databinding.ActivityMapsBinding
+import ca.sfu.duckhunt.model.WaterBody
+import ca.sfu.duckhunt.model.WaterBodyAdapter
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.Places
+
+import okhttp3.OkHttpClient
+import okhttp3.Request
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -37,6 +43,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+
+        val listView = findViewById<ListView>(R.id.list)
+        val waterList = ArrayList<WaterBody>()
+        waterList.add(WaterBody(true, "Bear Creek", 520, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(true, "Hunt Brook", 857, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(true, "Enver Creek", 900, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(true, "Surrey Lake", 1000, LatLng(0.0,0.0)))
+
+        /*
+        Places.initialize(applicationContext, R.string.api_key.toString())
+        val placesClient = Places.createClient(this)
+        val placeList = ArrayList<Place>()
+        val client: OkHttpClient = OkHttpClient().newBuilder()
+            .build()
+        val request = Request.Builder()
+            .url("https://maps.googleapis.com/maps/api/place/textsearch/json?query=123%20main%20street&location=42.3675294%2C-71.186966&radius=10000&key=C6:1A:9D:9F:15:E5:21:E1:02:FF:24:46:89:01:22:B8:AF:92:CA:2C")
+            .method("GET", null)
+            .build()
+        val response = client.newCall(request).execute()*/
+
+        val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, waterList, activity = MapsActivity())
+        listView.adapter = waterBodyAdapter
     }
 
     /**

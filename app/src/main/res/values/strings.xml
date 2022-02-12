@@ -2,4 +2,8 @@
     <string name="app_name">Duck Hunt</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="creators_tag">By Zaid Arshad and <br /> Daniel Nguyen</string>
+    <string name="api_key">"C6:1A:9D:9F:15:E5:21:E1:02:FF:24:46:89:01:22:B8:AF:92:CA:2C"</string>
+    <string name="_000m">000m</string>
+    <string name="name">Name</string>
+    <string name="has_duck">has duck</string>
 </resources>
