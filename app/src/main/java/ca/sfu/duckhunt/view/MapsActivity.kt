@@ -111,7 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
 
                     for (body in waterBodies) {
-                        body.setDistance(userPosition)
+                        body.setDistance(userPosition, context)
                     }
 
                     if (!placedDucks) {
