@@ -57,10 +57,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val listView = findViewById<ListView>(R.id.list)
         val waterList = ArrayList<WaterBody>()
-        waterList.add(WaterBody(true, "Bear Creek", 520, LatLng(0.0,0.0)))
-        waterList.add(WaterBody(true, "Hunt Brook", 857, LatLng(0.0,0.0)))
-        waterList.add(WaterBody(true, "Enver Creek", 900, LatLng(0.0,0.0)))
-        waterList.add(WaterBody(true, "Surrey Lake", 1000, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(false, "Bear Creek", 520, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(false, "Hunt Brook", 857, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(false, "Enver Creek", 900, LatLng(0.0,0.0)))
+        waterList.add(WaterBody(false, "Surrey Lake", 1000, LatLng(0.0,0.0)))
 
         /*
         Places.initialize(applicationContext, R.string.api_key.toString())
