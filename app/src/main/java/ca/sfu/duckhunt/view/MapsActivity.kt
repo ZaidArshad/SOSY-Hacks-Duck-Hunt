@@ -1,7 +1,13 @@
 package ca.sfu.duckhunt.view
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import ca.sfu.duckhunt.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -38,12 +44,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
+        locationPermissionCheck()
+        mMap.isMyLocationEnabled = true
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    }
+
+    private fun locationPermissionCheck() {
+        while (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            ActivityCompat.requestPermissions(
+                this as Activity,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                10
+            )
+        }
     }
 }
