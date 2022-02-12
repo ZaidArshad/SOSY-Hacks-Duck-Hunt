@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Duck Hunt</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="creators_tag">By Zaid Arshad and <br /> Daniel Nguyen</string>
 </resources>

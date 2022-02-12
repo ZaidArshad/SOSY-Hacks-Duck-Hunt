@@ -3,11 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Daniel/AndroidStudioProjects/SOSY-Hacks-Duck-Hunt/app/src/main/res/layout/activity_maps.xml" value="0.3625" />
+        <entry key="..\:/Users/Daniel/AndroidStudioProjects/SOSY-Hacks-Duck-Hunt/app/src/main/res/layout/activity_welcome_screen.xml" value="0.3484375" />
         <entry key="..\:/Users/zaidy/AndroidStudioProjects/DuckHunt/app/src/main/res/layout/activity_maps.xml" value="0.20572916666666666" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
