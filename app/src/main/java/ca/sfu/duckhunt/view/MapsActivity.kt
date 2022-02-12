@@ -110,6 +110,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     userPosition = LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
 
+                    for (body in waterBodies) {
+                        body.setDistance(userPosition)
+                    }
+
                     if (!placedDucks) {
                         waterBodyAdapter.notifyDataSetChanged()
                         for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())

@@ -24,6 +24,9 @@ class Route (
             destination.latitude + "," + destination.longitude +
             "&key=" + apiKey)
 
+    // Duration away from location in mins - "5 mins"
+    private var timeAway = ""
+
     fun generateRoute() {
         val path : MutableList<List<LatLng>> = ArrayList()
         val urlDirections = (routeString)
@@ -32,6 +35,10 @@ class Route (
             val jsonResponse = JSONObject(response)
             val routes = jsonResponse.getJSONArray("routes")
             val legs = routes.getJSONObject(0).getJSONArray("legs")
+            val legsObj = legs.getJSONObject(0)
+            val duration = legsObj.getJSONObject("duration")
+            timeAway = duration.getString("text")
+
             val steps = legs.getJSONObject(0).getJSONArray("steps")
             for (i in 0 until steps.length()) {
                 val points = steps.getJSONObject(i).getJSONObject("polyline").getString("points")
