@@ -3,6 +3,7 @@ package ca.sfu.duckhunt.model
 import android.content.Context
 import android.util.Log
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.model.CameraPosition
@@ -12,7 +13,7 @@ import org.json.JSONObject
 class NearbyBodyReceiver {
 
     companion object {
-        private fun processResponse(response: String, bodiesList: ArrayList<WaterBody>): ArrayList<WaterBody> {
+        private fun processResponse(response: String, bodiesList: ArrayList<WaterBody>, userPos : LatLng): ArrayList<WaterBody> {
             val bodies = JSONObject(response).getJSONArray("results")
 
             // Go through bodies
@@ -24,7 +25,6 @@ class NearbyBodyReceiver {
                 for (k in 0 until types.length()) {
                     if (types.get(k) == "natural_feature") {
                         val name = body.get("name").toString()
-                        val distance = 0
                         val position = LatLng(
                             body.getJSONObject("geometry").getJSONObject("location")
                                 .get("lat")
@@ -32,6 +32,7 @@ class NearbyBodyReceiver {
                             body.getJSONObject("geometry").getJSONObject("location")
                                 .get("lng")
                                 .toString().toDouble())
+                        val distance = calculateDistance(position, userPos)
                         bodiesList.add(WaterBody(false, name, distance, position))
                     }
                 }
@@ -39,7 +40,28 @@ class NearbyBodyReceiver {
             return bodiesList
         }
 
-        fun getBodies(context: Context): ArrayList<WaterBody> {
+        private fun calculateDistance(waterBodyLatLng : LatLng, userPos : LatLng) : Int {
+            val routeString = ("https://maps.googleapis.com/maps/api/directions/json?origin=" +
+                    userPos.latitude + "," + userPos.longitude + "&destination=" +
+                    waterBodyLatLng.latitude + "," + waterBodyLatLng.longitude +
+                    "&key=" + "AIzaSyALu3YZDlIvwdYwkEiVsYVu5vqK9cRonxA")
+
+            val urlDirections = (routeString)
+            var value = 0
+            object : StringRequest(Method.GET, urlDirections, Response.Listener {
+                    response ->
+                val jsonResponse = JSONObject(response)
+                val routes = jsonResponse.getJSONArray("routes")
+                val legs = routes.getJSONObject(0).getJSONArray("legs")
+                val distance = legs.getJSONObject(0).getJSONArray("distance")
+                value = distance.getJSONObject(0).getJSONObject("value").toString().toInt()
+            }, Response.ErrorListener {
+            }){}
+
+            return value
+        }
+
+        fun getBodies(context: Context, userPos : LatLng): ArrayList<WaterBody> {
             val queue = Volley.newRequestQueue(context)
             val typesOfBodies: Array<String> = arrayOf("creek", "pond", "bay", "canal", "wetland", "river", "lake", "ocean")
             var bodiesList = ArrayList<WaterBody>()
@@ -49,14 +71,16 @@ class NearbyBodyReceiver {
                 val stringRequest = StringRequest(
                     Request.Method.GET, url,
                     { response ->
-                        bodiesList = processResponse(response.toString(), bodiesList)
+                        bodiesList = processResponse(response.toString(), bodiesList, userPos)
                     },
                     { Log.d("request", "error") })
                 queue.add(stringRequest)
             }
             return bodiesList
         }
+    }
 
+    private fun obtainDistance() {
 
     }
 }

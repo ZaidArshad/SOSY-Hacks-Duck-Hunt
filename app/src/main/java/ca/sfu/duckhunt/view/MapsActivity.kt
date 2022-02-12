@@ -74,6 +74,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
+        val context = this
+
         mMap = googleMap
         locationPermissionCheck()
         mMap.isMyLocationEnabled = true
@@ -86,19 +88,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.interval = 30000
         locationRequest.fastestInterval = 10000
 
-        val button = findViewById<Button>(R.id.button)
-        val listView = findViewById<ListView>(R.id.list)
-        val waterBodies = NearbyBodyReceiver.getBodies(this)
-        val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, waterBodies, mMap)
-        listView.adapter = waterBodyAdapter
-
-
-
-        button.setOnClickListener {
-            waterBodyAdapter.notifyDataSetChanged()
-        }
-
         var placedDucks = false
+        val listView = findViewById<ListView>(R.id.list)
 
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.requestLocationUpdates(
@@ -109,6 +100,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
 
                     if (!placedDucks) {
+                        val waterBodies = NearbyBodyReceiver.getBodies(context, userPosition)
+                        val waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, mMap)
+                        listView.adapter = waterBodyAdapter
+
                         generateRouteTo(mMap, userPosition, exampleDestination)
                         waterBodyAdapter.notifyDataSetChanged()
                         for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())

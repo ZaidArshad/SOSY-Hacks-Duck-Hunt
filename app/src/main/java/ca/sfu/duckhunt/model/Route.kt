@@ -39,7 +39,7 @@ class Route (
             }
             for (i in 0 until path.size) {
                 map.addPolyline(PolylineOptions().addAll(path[i]).color(Color.RED))
-        }
+            }
 
         }, Response.ErrorListener {
         }){}
