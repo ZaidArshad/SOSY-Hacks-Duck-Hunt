@@ -12,43 +12,51 @@ import org.json.JSONObject
 class NearbyBodyReceiver {
 
     companion object {
-        fun getBodies(context: Context): ArrayList<WaterBody> {
-            val queue = Volley.newRequestQueue(context)
-            val typeOfBody = "creek"
-            val bodiesList = ArrayList<WaterBody>()
-            val url =
-                "https://maps.googleapis.com/maps/api/place/textsearch/json?query=$typeOfBody&key=AIzaSyALu3YZDlIvwdYwkEiVsYVu5vqK9cRonxA"
-            val stringRequest = StringRequest(
-                Request.Method.GET, url,
-                { response ->
-                    val bodies = JSONObject(response.toString()).getJSONArray("results")
+        private fun processResponse(response: String, bodiesList: ArrayList<WaterBody>): ArrayList<WaterBody> {
+            val bodies = JSONObject(response).getJSONArray("results")
 
-                    // Go through bodies
-                    for (i in 0 until bodies.length()) {
-                        val body = bodies.getJSONObject(i)
-                        val types = body.getJSONArray("types")
+            // Go through bodies
+            for (i in 0 until bodies.length()) {
+                val body = bodies.getJSONObject(i)
+                val types = body.getJSONArray("types")
 
-                        // Go through types
-                        for (k in 0 until types.length()) {
-                            if (types.get(k) == "natural_feature") {
-                                val name = body.get("name").toString()
-                                val distance = 0
-                                val position = LatLng(
-                                    body.getJSONObject("geometry").getJSONObject("location")
-                                        .get("lat")
-                                        .toString().toDouble(),
-                                    body.getJSONObject("geometry").getJSONObject("location")
-                                        .get("lng")
-                                        .toString().toDouble()
-                                )
-                                bodiesList.add(WaterBody(false, name, distance, position))
-                            }
-                        }
+                // Go through types
+                for (k in 0 until types.length()) {
+                    if (types.get(k) == "natural_feature") {
+                        val name = body.get("name").toString()
+                        val distance = 0
+                        val position = LatLng(
+                            body.getJSONObject("geometry").getJSONObject("location")
+                                .get("lat")
+                                .toString().toDouble(),
+                            body.getJSONObject("geometry").getJSONObject("location")
+                                .get("lng")
+                                .toString().toDouble())
+                        bodiesList.add(WaterBody(false, name, distance, position))
                     }
-                },
-                { Log.d("request", "error") })
-            queue.add(stringRequest)
+                }
+            }
             return bodiesList
         }
+
+        fun getBodies(context: Context): ArrayList<WaterBody> {
+            val queue = Volley.newRequestQueue(context)
+            val typesOfBodies: Array<String> = arrayOf("creek", "pond", "bay", "canal", "wetland", "river", "lake", "ocean")
+            var bodiesList = ArrayList<WaterBody>()
+            for (typeOfBody in typesOfBodies) {
+                val url =
+                    "https://maps.googleapis.com/maps/api/place/textsearch/json?query=$typeOfBody&key=AIzaSyALu3YZDlIvwdYwkEiVsYVu5vqK9cRonxA"
+                val stringRequest = StringRequest(
+                    Request.Method.GET, url,
+                    { response ->
+                        bodiesList = processResponse(response.toString(), bodiesList)
+                    },
+                    { Log.d("request", "error") })
+                queue.add(stringRequest)
+            }
+            return bodiesList
+        }
+
+
     }
 }

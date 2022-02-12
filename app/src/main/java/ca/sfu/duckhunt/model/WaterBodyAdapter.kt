@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import ca.sfu.duckhunt.R
 import ca.sfu.duckhunt.view.MapsActivity
-import com.google.android.libraries.places.api.model.Place
 
 class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<WaterBody>, activity: MapsActivity):
     ArrayAdapter<WaterBody>(context, resource, objects) {
@@ -35,7 +34,7 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
         nameView.text = name
         distanceView.text = distance.toString() + "m"
         duckButton.setOnClickListener {
-            if (getItem(position)?.getHasDuck() == false) {
+            if (getItem(position)?.hasDuck() == false) {
                 getItem(position)?.setHasDuck(true)
                 duckButton.setImageResource(R.drawable.duck_pic_black)
             }

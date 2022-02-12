@@ -10,7 +10,9 @@ import android.os.Bundle
 import android.os.Looper
 import android.widget.Button
 import android.widget.ListView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.drawable.toBitmap
 import ca.sfu.duckhunt.R
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.duckhunt.databinding.ActivityMapsBinding
 import ca.sfu.duckhunt.model.NearbyBodyReceiver
 import ca.sfu.duckhunt.model.Route
+import ca.sfu.duckhunt.model.WaterBody
 import ca.sfu.duckhunt.model.WaterBodyAdapter
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -29,7 +32,7 @@ import com.google.android.gms.location.LocationResult
 
 
 import com.google.android.gms.location.LocationServices
-
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -101,10 +104,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     userPosition = LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
                     generateRouteTo(mMap, userPosition, exampleDestination)
+                    waterBodyAdapter.notifyDataSetChanged()
                 }
             },
             Looper.getMainLooper()
         )
+    }
+
+    private fun drawMarker(waterBody: WaterBody) {
+        var img = 0
+        if (waterBody.hasDuck()) img = R.drawable.duck_pic
+        else img = R.drawable.duck_pic_black
+
+        val duckyIcon = AppCompatResources.getDrawable(
+            this, img)!!.toBitmap()
+        val duckyMarker = MarkerOptions()
+        duckyMarker.icon(BitmapDescriptorFactory.fromBitmap(duckyIcon))
+
+        // Puts the created marker on map
+        duckyMarker.position(waterBody.getPosition())
+        mMap.addMarker(duckyMarker)!!
     }
 
     private fun generateRouteTo(map : GoogleMap, userPosition : LatLng, destination : LatLng) {

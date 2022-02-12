@@ -8,7 +8,7 @@ class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng)
     private val mDistance = distance
     private val mPosition = position
 
-    fun getHasDuck(): Boolean { return mHasDuck }
+    fun hasDuck(): Boolean { return mHasDuck }
     fun setHasDuck(bool : Boolean) {
         mHasDuck = bool
     }
