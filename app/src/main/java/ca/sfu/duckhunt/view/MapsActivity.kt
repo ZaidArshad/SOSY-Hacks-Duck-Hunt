@@ -3,12 +3,12 @@ package ca.sfu.duckhunt.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
+
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
+import android.widget.Button
 import android.widget.ListView
 import androidx.core.app.ActivityCompat
 import ca.sfu.duckhunt.R
@@ -20,27 +20,23 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.duckhunt.databinding.ActivityMapsBinding
-import ca.sfu.duckhunt.model.WaterBody
-import ca.sfu.duckhunt.model.WaterBodyAdapter
+import ca.sfu.duckhunt.model.NearbyBodyReceiver
 import ca.sfu.duckhunt.model.Route
+import ca.sfu.duckhunt.model.WaterBodyAdapter
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.Marker
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.Places
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
+
+import com.google.android.gms.location.LocationServices
+
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var userPosition : LatLng
-    private lateinit var currentDestination : LatLng
+    private lateinit var userPosition: LatLng
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,27 +51,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
 
-        val listView = findViewById<ListView>(R.id.list)
+        /*val listView = findViewById<ListView>(R.id.list)
         val waterList = ArrayList<WaterBody>()
         waterList.add(WaterBody(true, "Bear Creek", 520, LatLng(0.0,0.0)))
         waterList.add(WaterBody(true, "Hunt Brook", 857, LatLng(0.0,0.0)))
         waterList.add(WaterBody(true, "Enver Creek", 900, LatLng(0.0,0.0)))
         waterList.add(WaterBody(true, "Surrey Lake", 1000, LatLng(0.0,0.0)))
-
-        /*
-        Places.initialize(applicationContext, R.string.api_key.toString())
-        val placesClient = Places.createClient(this)
-        val placeList = ArrayList<Place>()
-        val client: OkHttpClient = OkHttpClient().newBuilder()
-            .build()
-        val request = Request.Builder()
-            .url("https://maps.googleapis.com/maps/api/place/textsearch/json?query=123%20main%20street&location=42.3675294%2C-71.186966&radius=10000&key=C6:1A:9D:9F:15:E5:21:E1:02:FF:24:46:89:01:22:B8:AF:92:CA:2C")
-            .method("GET", null)
-            .build()
-        val response = client.newCall(request).execute()*/
-
         val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, waterList, activity = MapsActivity())
-        listView.adapter = waterBodyAdapter
+        listView.adapter = waterBodyAdapter*/
     }
 
     /**
@@ -100,6 +83,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.interval = 30000
         locationRequest.fastestInterval = 30000
 
+        val button = findViewById<Button>(R.id.button)
+        val listView = findViewById<ListView>(R.id.list)
+        val list = NearbyBodyReceiver.getBodies(this)
+        val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, list, activity = MapsActivity())
+        listView.adapter = waterBodyAdapter
+
+        button.setOnClickListener {
+            waterBodyAdapter.notifyDataSetChanged()
+        }
+
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.requestLocationUpdates(
             locationRequest, object : LocationCallback() {
@@ -122,6 +115,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun locationPermissionCheck() {
+        var permission = true
         while (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -130,12 +124,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-
-            ActivityCompat.requestPermissions(
-                this as Activity,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                10
-            )
+            if (permission) {
+                permission = false
+                ActivityCompat.requestPermissions(
+                    this as Activity,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    10
+                )
+            }
         }
     }
 }
