@@ -13,7 +13,7 @@ import org.json.JSONObject
 class NearbyBodyReceiver {
 
     companion object {
-        private fun processResponse(response: String, bodiesList: ArrayList<WaterBody>, userPos : LatLng): ArrayList<WaterBody> {
+        private fun processResponse(response: String, bodiesList: ArrayList<WaterBody>): ArrayList<WaterBody> {
             val bodies = JSONObject(response).getJSONArray("results")
 
             // Go through bodies
@@ -32,7 +32,7 @@ class NearbyBodyReceiver {
                             body.getJSONObject("geometry").getJSONObject("location")
                                 .get("lng")
                                 .toString().toDouble())
-                        val distance = calculateDistance(position, userPos)
+                        val distance = 0
                         bodiesList.add(WaterBody(false, name, distance, position))
                     }
                 }
@@ -61,7 +61,7 @@ class NearbyBodyReceiver {
             return value
         }
 
-        fun getBodies(context: Context, userPos : LatLng): ArrayList<WaterBody> {
+        fun getBodies(context: Context): ArrayList<WaterBody> {
             val queue = Volley.newRequestQueue(context)
             val typesOfBodies: Array<String> = arrayOf("creek", "pond", "bay", "canal", "wetland", "river", "lake", "ocean")
             var bodiesList = ArrayList<WaterBody>()
@@ -71,7 +71,7 @@ class NearbyBodyReceiver {
                 val stringRequest = StringRequest(
                     Request.Method.GET, url,
                     { response ->
-                        bodiesList = processResponse(response.toString(), bodiesList, userPos)
+                        bodiesList = processResponse(response.toString(), bodiesList)
                     },
                     { Log.d("request", "error") })
                 queue.add(stringRequest)

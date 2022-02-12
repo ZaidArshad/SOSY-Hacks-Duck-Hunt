@@ -90,7 +90,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         var placedDucks = false
         val listView = findViewById<ListView>(R.id.list)
-
+        val waterBodies = NearbyBodyReceiver.getBodies(context)
+        val waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, mMap)
+        listView.adapter = waterBodyAdapter
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.requestLocationUpdates(
             locationRequest, object : LocationCallback() {
@@ -100,10 +102,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
 
                     if (!placedDucks) {
-                        val waterBodies = NearbyBodyReceiver.getBodies(context, userPosition)
-                        val waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, mMap)
-                        listView.adapter = waterBodyAdapter
-
                         generateRouteTo(mMap, userPosition, exampleDestination)
                         waterBodyAdapter.notifyDataSetChanged()
                         for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
