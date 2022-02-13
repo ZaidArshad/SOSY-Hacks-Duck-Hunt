@@ -59,6 +59,7 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
         }
 
         duckButton.setOnClickListener {
+            mMap.clear()
             if (getItem(position)?.hasDuck() == false) {
                 getItem(position)?.setHasDuck(true)
                 duckButton.setImageResource(R.drawable.duck_pic_black)
@@ -68,6 +69,8 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
                 duckButton.setImageResource(R.drawable.duck_pic)
                 quackSound.start()
             }
+            mActivity.updateList()
+            mActivity.drawAllMarkers()
         }
 
         view.setOnClickListener {

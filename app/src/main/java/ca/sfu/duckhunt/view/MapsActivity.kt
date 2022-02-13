@@ -41,6 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var waterBodyAdapter: WaterBodyAdapter
+    private lateinit var waterBodies: ArrayList<WaterBody>
     lateinit var userPosition: LatLng
     lateinit var button: Button
     lateinit var listView: ListView
@@ -58,6 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         button = findViewById(R.id.button)
+        waterBodies = ArrayList()
     }
 
     /**
@@ -126,7 +128,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     if (!placedDucks) {
                         waterBodyAdapter.notifyDataSetChanged()
-                        for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
+                        drawAllMarkers()
                         if (waterBodies.size > 0) placedDucks = true
                     }
                 }
@@ -152,7 +154,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         waterBodyAdapter.notifyDataSetChanged()
     }
 
-    private fun drawMarker(hasDuck: Boolean, position: LatLng) {
+    fun drawAllMarkers() {
+        for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
+    }
+
+    fun drawMarker(hasDuck: Boolean, position: LatLng) {
         var img = 0
         if (hasDuck) img = R.drawable.duck_pic
         else img = R.drawable.duck_pic_black
