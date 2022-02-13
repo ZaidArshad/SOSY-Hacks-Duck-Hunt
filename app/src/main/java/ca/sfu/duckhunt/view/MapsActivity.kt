@@ -6,8 +6,10 @@ import android.app.Activity
 
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.widget.Button
 import android.widget.ListView
@@ -23,10 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.duckhunt.databinding.ActivityMapsBinding
-import ca.sfu.duckhunt.model.Animations
-import ca.sfu.duckhunt.model.NearbyBodyReceiver
-import ca.sfu.duckhunt.model.Route
-import ca.sfu.duckhunt.model.WaterBodyAdapter
+import ca.sfu.duckhunt.model.*
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -34,12 +33,14 @@ import com.google.android.gms.location.LocationResult
 
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import kotlin.math.sqrt
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var waterBodyAdapter: WaterBodyAdapter
     lateinit var userPosition: LatLng
     lateinit var listView: ListView
 
@@ -54,7 +55,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
 
         /*val listView = findViewById<ListView>(R.id.list)
         val waterList = ArrayList<WaterBody>()
@@ -79,7 +79,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val context = this
 
         mMap = googleMap
-        locationPermissionCheck()
         mMap.isMyLocationEnabled = true
 
         //Erase later on
@@ -92,30 +91,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val button = findViewById<Button>(R.id.button)
 
-        button.setOnClickListener {
-            Animations.fadeIn(listView,this)
-        }
-
         var placedDucks = false
         listView = findViewById<ListView>(R.id.list)
-        val waterBodies = NearbyBodyReceiver.getBodies(context)
-        val waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, this, mMap)
+        val waterBodies = NearbyBodyReceiver.getBodies(this)
+        waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, this, mMap)
         listView.adapter = waterBodyAdapter
 
+        button.setOnClickListener {
+            Animations.fadeIn(listView,this)
+            for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
+            waterBodyAdapter.notifyDataSetChanged()
+        }
+
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        var oldLocation: LatLng
+        userPosition = LatLng(0.0,0.0)
+
+        val handler = Handler()
+
         fusedLocationClient.requestLocationUpdates(
             locationRequest, object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
                     super.onLocationResult(locationResult)
-                    userPosition = LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
+                    oldLocation = userPosition
+                    handler.postDelayed(object: Runnable {
+                        override fun run() {
+                            waterBodyAdapter.notifyDataSetChanged()
+                            waterBodies.sort()
+                            handler.postDelayed(this, 1000)
+                        }
+                    }, 0)
 
-                    for (body in waterBodies) {
-                        body.setDistance(userPosition, context)
+                    if (isGapReached(oldLocation, LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude))) {
+                        userPosition = LatLng(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
+                        for (body in waterBodies) {
+                            body.setDistance(userPosition, context)
+                        }
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
+                        //sort waterBodies from smallest distance to largest
                     }
-
-                    //sort waterBodies from smallest distance to largest
-                    waterBodies.sort()
 
                     if (!placedDucks) {
                         waterBodyAdapter.notifyDataSetChanged()
@@ -134,25 +148,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         currentRoute.generateRoute()
     }
 
-    private fun locationPermissionCheck() {
-        var permission = true
-        while (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (permission) {
-                permission = false
-                ActivityCompat.requestPermissions(
-                    this as Activity,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    10
-                )
-            }
-        }
+    fun isGapReached(locationA: LatLng, locationB: LatLng): Boolean {
+        val dLat = kotlin.math.abs(locationA.latitude - locationB.latitude)
+        val dLong = kotlin.math.abs(locationA.longitude - locationB.longitude)
+        val radius = sqrt((dLat*dLat) + (dLong*dLong))
+        return (radius >= 0.00005)
+    }
+
+    private fun updateList() {
+        waterBodyAdapter.notifyDataSetChanged()
     }
 
     private fun drawMarker(hasDuck: Boolean, position: LatLng) {

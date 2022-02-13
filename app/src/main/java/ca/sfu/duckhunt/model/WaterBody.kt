@@ -7,6 +7,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
+import java.io.Serializable
 
 class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng) : Comparable<WaterBody> {
     private var mHasDuck = hasDuck
