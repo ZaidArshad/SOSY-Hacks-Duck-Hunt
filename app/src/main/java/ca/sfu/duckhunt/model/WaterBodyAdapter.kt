@@ -9,22 +9,19 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.graphics.drawable.toBitmap
 import ca.sfu.duckhunt.R
 import ca.sfu.duckhunt.view.MapsActivity
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import android.graphics.Bitmap
-
-import android.graphics.drawable.BitmapDrawable
-import android.opengl.Visibility
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 
-
+/**
+ * This class handles the list of bodies of water in the
+ * MapsActivity. It allows the user to toggle whether
+ * they saw a duck at a certain body of water, as well
+ * as updating the user's position occasionally.
+ */
 class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<WaterBody>, activity: MapsActivity, map: GoogleMap):
     ArrayAdapter<WaterBody>(context, resource, objects) {
     private val mContext = context
@@ -47,7 +44,7 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
 
         nameView.text = name
 
-        if (distance!! >= 1000) distanceView.text = (distance!!/1000).toString() + "km"
+        if (distance!! >= 1000) distanceView.text = (distance /1000).toString() + "km"
         else distanceView.text = distance.toString() + "m"
 
 

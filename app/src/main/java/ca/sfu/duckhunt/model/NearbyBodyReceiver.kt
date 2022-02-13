@@ -7,6 +7,13 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
+
+/**
+ * This class handles receiving the data for
+ * nearby bodies of water from Google Maps, and
+ * also instantiates all bodies of water for use
+ * in the program.
+ */
 class NearbyBodyReceiver {
 
     companion object {

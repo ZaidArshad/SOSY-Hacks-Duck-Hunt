@@ -10,11 +10,13 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import ca.sfu.duckhunt.R
 
+/**
+ * This class handles the welcome screen.
+ */
 class WelcomeScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

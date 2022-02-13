@@ -1,12 +1,7 @@
 package ca.sfu.duckhunt.view
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -14,10 +9,8 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.ListView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
 import ca.sfu.duckhunt.R
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,13 +22,16 @@ import ca.sfu.duckhunt.model.*
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-
-
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import kotlin.math.sqrt
 
-
+/**
+ * This class handles the interactivity and main
+ * functionalities of the Map Screen. Supports
+ * getting a route from your position to a
+ * desired body of water, toggling ducks, etc.
+ */
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
@@ -77,9 +73,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         mMap.isMyLocationEnabled = true
 
-        //Erase later on
-        val exampleDestination = LatLng(49.19233877677021, -122.77337166712296)
-
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 30000
@@ -88,7 +81,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val button = findViewById<Button>(R.id.button)
 
         var placedDucks = false
-        listView = findViewById<ListView>(R.id.list)
+        listView = findViewById(R.id.list)
         waterBodies = NearbyBodyReceiver.getBodies(this)
         waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, this, mMap)
         listView.adapter = waterBodyAdapter
@@ -127,7 +120,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             body.setDistance(userPosition, context)
                         }
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
-                        //sort waterBodies from smallest distance to largest
                     }
 
                     if (!placedDucks) {
@@ -142,6 +134,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun generateRouteTo(map : GoogleMap, destination : LatLng) {
+        mMap.addMarker(MarkerOptions().position(destination).title("Destination"))
         val currentRoute = Route(userPosition, destination, map, this)
         currentRoute.generateRoute()
     }
@@ -162,9 +155,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun drawMarker(hasDuck: Boolean, position: LatLng) {
-        var img = 0
-        if (hasDuck) img = R.drawable.duck_pic
-        else img = R.drawable.duck_pic_black
+        val img: Int = if (hasDuck) R.drawable.duck_pic
+        else R.drawable.duck_pic_black
 
         val duckyImg = AppCompatResources.getDrawable(
             this, img)!!.toBitmap()

@@ -9,6 +9,11 @@ import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
 
+/**
+ * This class represents each body of water.
+ * Data includes: if it has ducks or not, distance from origin,
+ * position in the map, and name of the body of water.
+ */
 class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng, context : Context) : Comparable<WaterBody> {
     private var mHasDuck = hasDuck
     private val mName = name

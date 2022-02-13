@@ -5,6 +5,9 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import ca.sfu.duckhunt.R
 
+/**
+ * This class handles the animations of the Map Screen.
+ */
 class Animations {
 
     companion object {
