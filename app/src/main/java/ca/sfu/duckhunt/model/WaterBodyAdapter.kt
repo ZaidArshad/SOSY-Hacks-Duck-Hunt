@@ -47,6 +47,14 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
 
         nameView.text = name
         distanceView.text = distance.toString() + "m"
+
+        if (getItem(position)?.hasDuck() == false) {
+            duckButton.setImageResource(R.drawable.duck_pic_black)
+        }
+        else {
+            duckButton.setImageResource(R.drawable.duck_pic)
+        }
+
         duckButton.setOnClickListener {
             if (getItem(position)?.hasDuck() == false) {
                 getItem(position)?.setHasDuck(true)
@@ -70,7 +78,7 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
         return view
     }
 
-    fun getBounds(points: Array<LatLng>): LatLngBounds {
+    private fun getBounds(points: Array<LatLng>): LatLngBounds {
 
         // Setting up variables
         var north = points.first().latitude

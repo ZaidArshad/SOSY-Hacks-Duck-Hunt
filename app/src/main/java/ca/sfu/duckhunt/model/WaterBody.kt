@@ -3,13 +3,12 @@ package ca.sfu.duckhunt.model
 import android.content.Context
 import android.util.Log
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
 
-class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng) {
+class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng) : Comparable<WaterBody> {
     private var mHasDuck = hasDuck
     private val mName = name
     private var mDistance = distance
@@ -30,7 +29,7 @@ class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng)
                 "&key=" + "AIzaSyALu3YZDlIvwdYwkEiVsYVu5vqK9cRonxA")
 
         val urlDirections = (routeString)
-        var value = 0
+        var value: Int
 
         val stringRequest = StringRequest(
             Request.Method.GET, urlDirections,
@@ -48,5 +47,15 @@ class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng)
 
         val requestQueue = Volley.newRequestQueue(context)
         requestQueue.add(stringRequest)
+    }
+
+    override fun compareTo(other: WaterBody): Int {
+        if (this.mDistance > other.mDistance) {
+            return 1
+        }
+        if (this.mDistance < other.mDistance ) {
+            return -1
+        }
+        return 0
     }
 }

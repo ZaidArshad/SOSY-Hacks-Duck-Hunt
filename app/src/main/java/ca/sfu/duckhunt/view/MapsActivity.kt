@@ -114,6 +114,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         body.setDistance(userPosition, context)
                     }
 
+                    //sort waterBodies from smallest distance to largest
+                    waterBodies.sort()
+
                     if (!placedDucks) {
                         waterBodyAdapter.notifyDataSetChanged()
                         for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
