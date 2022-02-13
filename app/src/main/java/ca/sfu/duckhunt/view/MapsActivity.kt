@@ -1,7 +1,12 @@
 package ca.sfu.duckhunt.view
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -9,8 +14,10 @@ import android.os.Looper
 import android.widget.Button
 import android.widget.ListView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
 import ca.sfu.duckhunt.R
+
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -22,6 +29,8 @@ import ca.sfu.duckhunt.model.*
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+
+
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import kotlin.math.sqrt
@@ -68,19 +77,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         mMap.isMyLocationEnabled = true
 
+        //Erase later on
+        val exampleDestination = LatLng(49.19233877677021, -122.77337166712296)
+
         val locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 30000
         locationRequest.fastestInterval = 10000
 
+        val button = findViewById<Button>(R.id.button)
+
         var placedDucks = false
-        listView = findViewById(R.id.list)
-        val waterBodies = NearbyBodyReceiver.getBodies(this)
+        listView = findViewById<ListView>(R.id.list)
+        waterBodies = NearbyBodyReceiver.getBodies(this)
         waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, this, mMap)
         listView.adapter = waterBodyAdapter
 
         button.setOnClickListener {
             Animations.fadeIn(listView,this)
+            mMap.clear()
             for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
             waterBodyAdapter.notifyDataSetChanged()
             Animations.fadeOut(button, this)
@@ -101,6 +116,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         override fun run() {
                             waterBodyAdapter.notifyDataSetChanged()
                             waterBodies.sort()
+                            updateList()
                             handler.postDelayed(this, 1000)
                         }
                     }, 0)
@@ -111,6 +127,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             body.setDistance(userPosition, context)
                         }
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 13F))
+                        //sort waterBodies from smallest distance to largest
                     }
 
                     if (!placedDucks) {
