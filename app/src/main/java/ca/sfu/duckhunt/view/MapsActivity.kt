@@ -42,6 +42,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var waterBodyAdapter: WaterBodyAdapter
     lateinit var userPosition: LatLng
+    lateinit var button: Button
     lateinit var listView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,14 +57,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        /*val listView = findViewById<ListView>(R.id.list)
-        val waterList = ArrayList<WaterBody>()
-        waterList.add(WaterBody(true, "Bear Creek", 520, LatLng(0.0,0.0)))
-        waterList.add(WaterBody(true, "Hunt Brook", 857, LatLng(0.0,0.0)))
-        waterList.add(WaterBody(true, "Enver Creek", 900, LatLng(0.0,0.0)))
-        waterList.add(WaterBody(true, "Surrey Lake", 1000, LatLng(0.0,0.0)))
-        val waterBodyAdapter = WaterBodyAdapter(this, R.layout.adapter_place, waterList, activity = MapsActivity())
-        listView.adapter = waterBodyAdapter*/
+        button = findViewById(R.id.button)
     }
 
     /**
@@ -89,11 +83,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.interval = 30000
         locationRequest.fastestInterval = 10000
 
-        val button = findViewById<Button>(R.id.button)
-
         var placedDucks = false
         listView = findViewById<ListView>(R.id.list)
-        val waterBodies = NearbyBodyReceiver.getBodies(this)
+        val waterBodies = NearbyBodyReceiver.getBodies(this, this)
         waterBodyAdapter = WaterBodyAdapter(context, R.layout.adapter_place, waterBodies, this, mMap)
         listView.adapter = waterBodyAdapter
 
@@ -101,6 +93,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Animations.fadeIn(listView,this)
             for (water in waterBodies) drawMarker(water.hasDuck(), water.getPosition())
             waterBodyAdapter.notifyDataSetChanged()
+            Animations.fadeOut(button, this)
         }
 
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -155,7 +148,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return (radius >= 0.00005)
     }
 
-    private fun updateList() {
+    fun updateList() {
         waterBodyAdapter.notifyDataSetChanged()
     }
 

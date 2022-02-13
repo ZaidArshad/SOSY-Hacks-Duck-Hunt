@@ -24,10 +24,12 @@
 
     <Button
         android:id="@+id/button"
+        android:textColor="@android:color/holo_blue_bright"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/ic_baseline_arrow_back_24"
         android:layout_gravity="left"
-        android:text="@string/show"
         tools:ignore="RtlHardcoded,TextContrastCheck" />
 
 </FrameLayout>

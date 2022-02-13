@@ -46,7 +46,10 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
         val duckButton = view.findViewById<ImageView>(R.id.duckButton)
 
         nameView.text = name
-        distanceView.text = distance.toString() + "m"
+
+        if (distance!! >= 1000) distanceView.text = (distance!!/1000).toString() + "km"
+        else distanceView.text = distance.toString() + "m"
+
 
         if (getItem(position)?.hasDuck() == false) {
             duckButton.setImageResource(R.drawable.duck_pic_black)
@@ -69,6 +72,7 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
 
         view.setOnClickListener {
             Animations.fadeOut(mActivity.listView, context)
+            Animations.fadeIn(mActivity.button, context)
             mMap.clear()
             val bound = getBounds(arrayOf(pos, mActivity.userPosition))
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bound, 100))
