@@ -24,7 +24,6 @@ class Route (
             destination.latitude + "," + destination.longitude +
             "&key=" + apiKey)
 
-    // Duration away from location in mins - "5 mins"
     private var timeAway = ""
 
     fun generateRoute() {

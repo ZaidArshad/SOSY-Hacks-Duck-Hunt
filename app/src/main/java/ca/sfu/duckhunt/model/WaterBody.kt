@@ -1,23 +1,30 @@
 package ca.sfu.duckhunt.model
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
-import java.io.Serializable
 
-class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng) : Comparable<WaterBody> {
+class WaterBody(hasDuck: Boolean, name: String, distance: Int, position: LatLng, context : Context) : Comparable<WaterBody> {
     private var mHasDuck = hasDuck
     private val mName = name
     private var mDistance = distance
     private val mPosition = position
+    private val sharedPreference: SharedPreferences = context.getSharedPreferences("HAS_DUCK", Context.MODE_PRIVATE)
+    private var editor: SharedPreferences.Editor = sharedPreference.edit()
 
-    fun hasDuck(): Boolean { return mHasDuck }
+    fun hasDuck(): Boolean {
+        mHasDuck = sharedPreference.getBoolean(mName, false)
+        return mHasDuck
+    }
     fun setHasDuck(bool : Boolean) {
         mHasDuck = bool
+        editor.putBoolean(mName, mHasDuck)
+        editor.commit()
     }
     fun getName(): String { return mName }
     fun getDistance(): Int { return mDistance }
