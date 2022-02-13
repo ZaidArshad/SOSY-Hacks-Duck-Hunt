@@ -63,11 +63,11 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
             if (getItem(position)?.hasDuck() == false) {
                 getItem(position)?.setHasDuck(true)
                 duckButton.setImageResource(R.drawable.duck_pic_black)
+                quackSound.start()
             }
             else {
                 getItem(position)?.setHasDuck(false)
                 duckButton.setImageResource(R.drawable.duck_pic)
-                quackSound.start()
             }
             mActivity.updateList()
             mActivity.drawAllMarkers()

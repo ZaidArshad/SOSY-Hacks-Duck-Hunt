@@ -142,7 +142,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun generateRouteTo(map : GoogleMap, destination : LatLng) {
-        mMap.addMarker(MarkerOptions().position(destination).title("Destination"))
         val currentRoute = Route(userPosition, destination, map, this)
         currentRoute.generateRoute()
     }
