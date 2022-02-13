@@ -48,6 +48,7 @@ class WaterBodyAdapter(context: Context, resource: Int, objects: ArrayList<Water
         else distanceView.text = distance.toString() + "m"
 
 
+
         if (getItem(position)?.hasDuck() == false) {
             duckButton.setImageResource(R.drawable.duck_pic_black)
         }
