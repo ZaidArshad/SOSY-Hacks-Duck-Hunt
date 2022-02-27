@@ -40,15 +40,19 @@ We wish we had more time to polish it and make it more responsive but are happy 
 Assets
 Ducky
 https://4vector.com/i/free-vector-ducky-clip-art_118391_Ducky_clip_art_hight.png
+
 Circle Duck Icon
 https://www.emojimeanings.org/duck/ 
+
 Transit icon
 https://cascadeseasttransit.com/wp-content/uploads/2017/10/transit-app-gray.png 
 
 ## Resources Used
 Getting names of nearby places
 https://developers.google.com/maps/documentation/places/web-service/search
+
 Google Maps Directions API (route from 1 lat,lng to another)
 https://medium.com/android-news/google-maps-directions-api-5b2e11dee9b0 
+
 Kotlin Implementation:
 https://lwgmnz.me/2018/09/20/google-maps-and-directions-api-using-kotlin/ 
