@@ -9,9 +9,7 @@
 
 ## Demo Video
 <div align="center">
-  <a href="https://www.youtube.com/watch?v=TBpJaygb37g&ab_channel=ZaidArshad
-" target="_blank"><img src="https://www.saskatoonprogressclub.com/wp-content/uploads/2021/05/free-youtube-logo-icon-2431-thumb.png" 
-alt="IMAGE ALT TEXT HERE" width="240" border="10" /></a>
+  <video src='https://user-images.githubusercontent.com/52565263/163834018-7c51de4c-dfa3-422f-be49-354aa99cb1f9.mp4' width='200'/>
 </div>
 
 
